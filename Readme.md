@@ -1,7 +1,7 @@
 # Личный проект «Кексобукинг» [![Build status][travis-image]][travis-url]
 
 * Студент: [Казис Юдайтис](https://up.htmlacademy.ru/javascript/12/user/448287).
-* Наставник: `Неизвестно`.
+* Наставник: `Игорь Антонов`.
 
 ---
 
