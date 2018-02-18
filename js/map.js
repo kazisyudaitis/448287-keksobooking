@@ -40,6 +40,17 @@ var ADVERT_PHOTOS = [
   'http://o0.github.io/assets/images/tokyo/hotel3.jpg'
 ];
 
+var ApartmentsTypes = {
+  flat: 'Квартира',
+  house: 'Дом',
+  bungalo: 'Бунгало'
+};
+
+var template = document.querySelector('template article.map__card');
+
+var mapTemplate = document.querySelector('template').content;
+var map = document.querySelector('.map');
+
 var makeRandomNumber = function (minNumber, maxNumber) {
   return Math.floor((maxNumber - minNumber + 1) * Math.random()) + minNumber;
 };
@@ -86,42 +97,82 @@ var makeAdvertOffers = function (count) {
   return result;
 };
 
+var createPin = function (advert, pinId) {
+  var pinElement = mapTemplate.querySelector('.map__pin').cloneNode(true);
 
-// var advertsObjects = makeAdvertOffers(8);
+  pinElement.style.left = advert.location.x + 24 + 'px';
+  pinElement.style.top = advert.location.y + 24 + 'px';
 
-// advertsObjects.forEach(function (it) {
-//   console.log(it);
-// });
+  pinElement.dataset.index = pinId;
+  pinElement.querySelector('img').src = advert.author.avatar;
+
+  return pinElement;
+};
+
+var renderPins = function (advertsArray) {
+  var docFragmnet = document.createDocumentFragment();
+
+  for (var i = 0; i < advertsArray.length; i++) {
+    var newPin = createPin(advertsArray[i], i);
+    docFragmnet.appendChild(newPin);
+  }
+
+  map.appendChild(docFragmnet);
+};
+
+var getFeaturesList = function (featuresArray) {
+  var featuresList = '';
+  for (var i = 0; i < featuresArray.length; i++) {
+    featuresList = '<li class="feature feature--' + featuresArray[i] + '"></li>' + featuresList;
+  }
+  return featuresList;
+};
+
+// Добавляет фотографии PHOTOS
+var getPhotosList = function (photosArray) {
+  var photosItem = '';
+  for (var i = 0; i < photosArray.length; i++) {
+    photosItem = '<li>' + '<img src ="' + photosArray[i] + '"  width = "70" height = "70"></li>' + photosItem;
+  }
+  return photosItem;
+};
+
+var createCardOffer = function (advert) {
+  var cardElement = mapTemplate.querySelector('.map__card').cloneNode(true);
+
+  cardElement.querySelector('h3').textContent = advert.offer.title;
+  cardElement.querySelector('h3+p').textContent = advert.offer.address;
+  cardElement.querySelector('.popup__price').textContent = advert.offer.price + ' \u20bd/ночь ';
+
+  cardElement.querySelector('h4').textContent = ApartmentsTypes[advert.offer.type];
+
+  cardElement.querySelector('h4+p').textContent = 'Комнат: ' + advert.offer.rooms + ' для ' + advert.offer.guests + '  гостей';
+  cardElement.querySelector('p:nth-of-type(4)').textContent = 'Заезд: ' + advert.offer.checkin + ', выезд: ' + advert.offer.checkout;
+
+  cardElement.querySelector('.popup__features').innerHTML = getFeaturesList(advert.offer.features);
+  cardElement.querySelector('.popup__pictures').innerHTML = getPhotosList(advert.offer.photos);
+
+  cardElement.querySelector('p').textContent = advert.offer.description;
 
 
-// Удалить класс у элемента
+  cardElement.querySelector('.popup__avatar').src = advert.author.avatar;
 
-// 1. Найти элемент
+  return cardElement;
+};
 
-var map = document.querySelector('.map');
+var renderAdvert = function (advert) {
+  var docFragmnet = document.createDocumentFragment();
+  var advertCard = createCardOffer(advert);
+  docFragmnet.appendChild(advertCard);
 
-// 2. Удалить
+  map.appendChild(docFragmnet);
+};
 
 map.classList.remove('map--faded');
 
+var allAdverts = makeAdvertOffers(8);
+renderPins(allAdverts);
 
-var createPin = function (advert) {
-  for (var i = 0; i < 8; i++) {
-    var result = document.createElement('button');
-    result.left = advert.location.x + 'px';
-    result.top = advert.location.y + 'px';
-    result.className = 'map_pins';
-    author.avatar = width = '40', height = '40';
-    draggable = 'false';
+renderAdvert(allAdverts[0]);
 
-  }
-  return result;
-}
-// var fragment = docment.createDocumentFragment('button');
-// var mapPins = document.querySelector('.map_pins');
-// mapPin.appendChild(fragment);
 
-//  <button style = "left: {{location.x}}px; top: {{location.y}}px;" class = "map__pin">
-//    <img src = "{{author.avatar}}" width = "40" height = "40" draggable = "false"></img>
-//  </button>
-var template = document.querySelector('template article.map__card');
