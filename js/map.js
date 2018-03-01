@@ -109,11 +109,19 @@ var createPin = function (advert, pinId) {
   return pinElement;
 };
 
+var onPinClick = function (evt) {
+  // renderAdvert(advertOffer);
+  var currentTarget = evt.currentTarget;
+  var index = currentTarget.dataset.index;
+  renderAdvert(allAdverts[index]);
+};
+
 var renderPins = function (advertsArray) {
   var docFragmnet = document.createDocumentFragment();
 
   for (var i = 0; i < advertsArray.length; i++) {
     var newPin = createPin(advertsArray[i], i);
+    newPin.addEventListener('click', onPinClick); // .bind(null, advertsArray[i]));
     docFragmnet.appendChild(newPin);
   }
 
@@ -137,8 +145,31 @@ var getPhotosList = function (photosArray) {
   return photosItem;
 };
 
+var closeAdvertCard = function () {
+  var opennedCard = map.querySelector('.map__card');
+  map.removeChild(opennedCard);
+};
+// создаем функцю для удаления обработчика
+var onPopupCloseBtnClick = function (evt) {
+  evt.currentTarget.removeEventListener('click', onPopupCloseBtnClick);
+  closeAdvertCard();
+};
+
+// Пишем функцию onEscDownOfferCard....
+var ESC_KEYCODE = 27;
+var onEscDownOfferCard = function (evt) {
+  if (evt.keyCode === ESC_KEYCODE) {
+    evt.currentTarget.removeEventListener('keydown', onEscDownOfferCard);
+    closeAdvertCard();
+  }
+};
+
 var createCardOffer = function (advert) {
   var cardElement = mapTemplate.querySelector('.map__card').cloneNode(true);
+  // Находим элемент и добавляем обработчик
+  cardElement.querySelector('.popup__close').addEventListener('click', onPopupCloseBtnClick);
+  // Пишем код для установки обработчика keydown.
+  document.addEventListener('keydown', onEscDownOfferCard);
 
   cardElement.querySelector('h3').textContent = advert.offer.title;
   cardElement.querySelector('h3+p').textContent = advert.offer.address;
@@ -165,7 +196,14 @@ var renderAdvert = function (advert) {
   var advertCard = createCardOffer(advert);
   docFragmnet.appendChild(advertCard);
 
-  map.appendChild(docFragmnet);
+  var anotherArticle = map.querySelector('.map__card');
+
+  if (!anotherArticle) {
+    map.appendChild(docFragmnet);
+    return;
+  }
+
+  map.replaceChild(docFragmnet, anotherArticle);
 };
 
 map.classList.remove('map--faded');
@@ -173,6 +211,4 @@ map.classList.remove('map--faded');
 var allAdverts = makeAdvertOffers(8);
 renderPins(allAdverts);
 
-renderAdvert(allAdverts[0]);
-
-
+// renderAdvert(allAdverts[0]);
