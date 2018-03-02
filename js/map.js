@@ -46,7 +46,7 @@ var ApartmentsTypes = {
   bungalo: 'Бунгало'
 };
 
-var template = document.querySelector('template article.map__card');
+// var template = document.querySelector('template article.map__card');
 
 var mapTemplate = document.querySelector('template').content;
 var map = document.querySelector('.map');
